@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans.xsd
+		 http://www.springframework.org/schema/rabbit
+		 http://www.springframework.org/schema/rabbit/spring-rabbit.xsd">
+
+    <bean id="pushMQListener" class="com.example.demo.mq.rabbitmq.spring.PushMQListener"/>
+
+    <rabbit:listener-container connection-factory="testConnectionFactory" acknowledge="auto" message-converter="jsonMessageConverter">
+        <rabbit:listener queue-names="direct.queue.1" ref="pushMQListener" method="onDirectMessage1"/>
+        <rabbit:listener queue-names="direct.queue.2" ref="pushMQListener" method="onDirectMessage2"/>
+    </rabbit:listener-container>
+
+    <rabbit:listener-container connection-factory="mainConnectionFactory" acknowledge="auto" message-converter="jsonMessageConverter">
+        <rabbit:listener queue-names="topic.queue.1" ref="pushMQListener" method="onTopicMessage1"/>
+        <rabbit:listener queue-names="topic.queue.2" ref="pushMQListener" method="onTopicMessage2"/>
+        <rabbit:listener queue-names="topic.queue.3" ref="pushMQListener" method="onTopicMessage3"/>
+    </rabbit:listener-container>
+
+</beans>

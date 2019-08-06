@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans.xsd
+		 http://www.springframework.org/schema/rabbit
+		 http://www.springframework.org/schema/rabbit/spring-rabbit.xsd">
+
+
+    <!-- main vhost 连接工厂 -->
+    <rabbit:connection-factory
+            id="mainConnectionFactory"
+            addresses="127.0.0.1:5672"
+            virtual-host="main"
+            username="guest"
+            password="guest"
+            cache-mode="CHANNEL"
+            channel-cache-size="10"
+            connection-timeout="3000"
+    />
+
+    <!-- test vhost 连接工厂 -->
+    <rabbit:connection-factory
+            id="testConnectionFactory"
+            addresses="127.0.0.1:5672"
+            virtual-host="test"
+            username="guest"
+            password="guest"
+            cache-mode="CHANNEL"
+            channel-cache-size="10"
+            connection-timeout="3000"
+    />
+
+    <!-- main vhost 管理器 -->
+    <rabbit:admin id="mainAdmin" connection-factory="mainConnectionFactory"/>
+    <!-- test vhost 管理器 -->
+    <rabbit:admin id="testAdmin" connection-factory="testConnectionFactory"/>
+
+    <!-- JSON 消息转换器 -->
+    <bean id="jsonMessageConverter" class="org.springframework.amqp.support.converter.Jackson2JsonMessageConverter"/>
+
+    <!-- ================= direct类型交换机 ================= -->
+    <rabbit:direct-exchange name="DirectExchange" declared-by="testAdmin" auto-declare="true" auto-delete="false" durable="true">
+        <rabbit:bindings>
+
+            <rabbit:binding key="direct.message.1" queue="direct.queue.1"/>
+            <rabbit:binding key="direct.message.2" queue="direct.queue.2"/>
+
+        </rabbit:bindings>
+    </rabbit:direct-exchange>
+
+    <rabbit:template id="directMQTemplate" connection-factory="testConnectionFactory" exchange="DirectExchange" message-converter="jsonMessageConverter"/>
+
+
+    <!-- ================= topic类型交换机 ================= -->
+    <rabbit:topic-exchange name="TopicExchange" declared-by="mainAdmin" auto-declare="true" auto-delete="false" durable="true">
+        <rabbit:exchange-arguments/>
+        <rabbit:bindings>
+
+            <rabbit:binding pattern="topic.message.1" queue="topic.queue.1"/>
+            <rabbit:binding pattern="topic.message.2.#" queue="topic.queue.2"/>
+            <rabbit:binding pattern="topic.message.3.*" queue="topic.queue.3"/>
+
+        </rabbit:bindings>
+    </rabbit:topic-exchange>
+
+    <rabbit:template id="topicMQTemplate" connection-factory="mainConnectionFactory" exchange="TopicExchange" message-converter="jsonMessageConverter"/>
+
+
+    <!-- =========================== message queue =========================== -->
+    <rabbit:queue name="direct.queue.1" declared-by="testAdmin" auto-declare="true" auto-delete="false" durable="true" exclusive="false">
+        <rabbit:queue-arguments>
+            <entry key="x-max-length" value="1000000" value-type="java.lang.Long"/>
+            <entry key="x-max-length-bytes" value="300485760" value-type="java.lang.Long"/>
+        </rabbit:queue-arguments>
+    </rabbit:queue>
+
+    <rabbit:queue name="direct.queue.2" declared-by="testAdmin" auto-declare="true" auto-delete="false" durable="true" exclusive="false">
+        <rabbit:queue-arguments>
+            <entry key="x-max-length" value="1000000" value-type="java.lang.Long"/>
+            <entry key="x-max-length-bytes" value="300485760" value-type="java.lang.Long"/>
+        </rabbit:queue-arguments>
+    </rabbit:queue>
+
+    <rabbit:queue name="topic.queue.1" declared-by="mainAdmin" auto-declare="true" auto-delete="false" durable="true" exclusive="false">
+        <rabbit:queue-arguments>
+            <entry key="x-max-length" value="1000000" value-type="java.lang.Long"/>
+            <entry key="x-max-length-bytes" value="300485760" value-type="java.lang.Long"/>
+        </rabbit:queue-arguments>
+    </rabbit:queue>
+
+    <rabbit:queue name="topic.queue.2" declared-by="mainAdmin" auto-declare="true" auto-delete="false" durable="true" exclusive="false">
+        <rabbit:queue-arguments>
+            <entry key="x-max-length" value="1000000" value-type="java.lang.Long"/>
+            <entry key="x-max-length-bytes" value="300485760" value-type="java.lang.Long"/>
+        </rabbit:queue-arguments>
+    </rabbit:queue>
+
+    <rabbit:queue name="topic.queue.3" declared-by="mainAdmin" auto-declare="true" auto-delete="false" durable="true" exclusive="false">
+        <rabbit:queue-arguments>
+            <entry key="x-max-length" value="1000000" value-type="java.lang.Long"/>
+            <entry key="x-max-length-bytes" value="300485760" value-type="java.lang.Long"/>
+        </rabbit:queue-arguments>
+    </rabbit:queue>
+
+</beans>

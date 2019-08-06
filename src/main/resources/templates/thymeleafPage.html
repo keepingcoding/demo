@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <p>start ~~~~~~~~</p>
+
+    <span>①.显示普通文本</span>
+    <p th:text="${name}"></p>
+    <hr/>
+
+    <span>②.显示带有样式的文本</span>
+    <p th:utext="'返回红色文字：' + ${style}"></p>
+    <hr/>
+
+    <span>③.显示对象</span>
+    <br/>
+    <span>方式一：</span>
+    <div>
+        <p th:text="'姓名：' + ${obj.name}"></p>
+        <p th:text="'年龄：' + ${obj.age}"></p>
+        <p th:text="'联系方式：' + ${obj.telephone}"></p>
+        <p th:text="'联系地址：' + ${obj.address}"></p>
+    </div>
+    <span>方式二：</span>
+    <div th:object="${obj}">
+        <p th:text="'姓名：' + *{name}"></p>
+        <p th:text="'年龄：' + *{age}"></p>
+        <p th:text="'联系方式：' + *{telephone}"></p>
+        <p th:text="'联系地址：' + *{address}"></p>
+    </div>
+    <hr/>
+
+    <span>④.数据处理</span>
+    <p th:text="${#dates.format(date,'yyyy-MM-dd')}"></p>
+    <p th:text="${#dates.format(date,'yyyy-MM-dd HH:mm:ss.SSS')}"></p>
+
+    <p th:text="${#strings.replace('www.baidu.com','.','@')}"></p>
+    <p th:text="${#strings.toUpperCase('www.baidu.com')}"></p>
+    <p th:text="${#strings.trim('www.baidu.com')}"></p>
+
+    <p th:text="${#sets.contains(set,'aaa')}"></p>
+    <p th:text="${#sets.size(set)}"></p>
+    <p th:text="${#lists.contains(list,'222')}"></p>
+    <p th:text="${#lists.size(list)}"></p>
+
+    <p th:text="${set[0]}"></p>
+    <p th:text="${list[0]}"></p>
+    <hr/>
+
+    <span>⑤.链接(URL)表达式</span>
+    <!--
+        动态和静态区别
+        静态页面的return默认是跳转到/static/index.html，当在pom.xml中引入了thymeleaf组件，动态跳转会覆盖默认的静态跳转，
+        默认就会跳转到/templates/index.html，注意看两者return代码也有区别，动态没有html后缀。
+        重定向
+        如果在使用动态页面时还想跳转到/static/index.html，可以使用重定向return "redirect:/index.html"
+    -->
+    <!--
+        现在的问题是：
+        默认跳转到static目录下可以直接写该目录下的文件路径，
+        跳转到别的目录可以通过后台重定向,
+            还可以加入spring.resources.static-locations=classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,classpath:/public/,classpath:/templates/
+            （这样静态页面可以直接写文件路径了）
+        引入了thymeleaf组件，通过后台跳转的默认到templates目录下，要跳转到别的目录需要加"redirect:"重定向
+    -->
+    <br/>
+    <a th:href="@{/}">点击请求后台</a><br/>
+    <a th:href="@{/index}">点击跳转static下页面</a><br/>
+    <a th:href="@{/test.html}">点击跳转其他页面</a>
+    <hr/>
+
+    <span>⑥.逻辑处理</span>
+    <br/>
+    <span th:if="${obj.name eq 'zhangsan'}">zhangsan, welcome!</span><br/>
+    <span th:if="${obj.name == 'zhangsan'}">zhangsan, welcome!</span><br/>
+    <span th:if="${obj.age le 20}">未成年！！！</span><br/>
+    <span th:if="${obj.age <= 20}">未成年！！！</span><br/>
+    <span th:if="${obj.telephone ne '12345678900'}">手机号不正确！！！</span><br/>
+    <span th:if="${obj.telephone != '12345678900'}">手机号不正确！！！</span><br/>
+    <hr/>
+
+    <span>⑦.集合</span><br/>
+    <span>遍历list：</span>
+    <table>
+        <tr>
+            <th>序号</th>
+            <th>姓名</th>
+            <th>年龄</th>
+            <th>联系方式</th>
+            <th>联系地址</th>
+        </tr>
+        <tr th:each="p,memberStat:${objList}">
+            <td th:text="${memberStat.index + 1}"></td>
+            <td th:text="${p.name}"></td>
+            <td th:text="${p.age}"></td>
+            <td th:text="${p.telephone}"></td>
+            <td th:text="${p.address}"></td>
+        </tr>
+    </table>
+
+    <span>遍历map：</span>
+    <table>
+        <tr>
+            <th>序号</th>
+            <th>key</th>
+            <th>姓名</th>
+            <th>年龄</th>
+            <th>联系方式</th>
+            <th>联系地址</th>
+        </tr>
+        <tr th:each="entry,memberStat:${objMap}">
+            <td th:text="${memberStat.index + 1}"></td>
+            <td th:text="${entry.key}"></td>
+            <td th:text="${entry.value.name}"></td>
+            <td th:text="${entry.value.age}"></td>
+            <td th:text="${entry.value.telephone}"></td>
+            <td th:text="${entry.value.address}"></td>
+        </tr>
+    </table>
+
+    <hr/>
+
+    <span>⑧.页面引入</span><br/>
+    <div th:include="@{/commons/footer.html} :: companyInfo" th:with="projectName=百度"></div>
+    <!--<div th:replace="@{/commons/footer.html} :: companyInfo"></div>-->
+
+
+    <p>end ~~~~~~~~</p>
+</body>
+</html>
