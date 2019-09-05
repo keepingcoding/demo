@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="uploadApp">
+
+    <h2>上传</h2>
+    <input type="file"/>
+    <br/><br/><br/>
+    <button @click="goUpload" style="width: 80px;height: 30px;">上传</button>
+
+    <hr/>
+    <h2>下载</h2>
+    <span>{{ saveFileName }}</span>
+    <br/><br/><br/>
+    <button @click="goDownloadByGet" style="width: 80px;height: 30px;">GET下载</button>
+    <button @click="goDownloadByPost" style="width: 80px;height: 30px;">POST下载</button>
+
+</div>
+
+<script src="/js/public/vue.min.js"></script>
+<script src="/js/public/axios.min.js"></script>
+
+<script>
+    let app = new Vue({
+        el: '#uploadApp',
+        data: {
+            saveFileName: ''
+        },
+        methods: {
+            verifyFile: (file) => {
+                if (file == null) {
+                    alert('请上传图片！');
+                    return false;
+                }
+                let img_regexp = /^image\/\w+/g;
+                if (!img_regexp.test(file.type)) {
+                    alert('上传的不是图片，请重新选择！');
+                    return false;
+                }
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('上传的图片大于5MB，请重新选择！');
+                    return false;
+                }
+                return true;
+            },
+            goUpload: () => {
+                let file = document.querySelector('input[type=file]').files[0];
+                //if(!app.verifyFile(file)){
+                //    return;
+                //}
+
+                let formData = new window.FormData();
+                formData.append('file', file);
+                axios({
+                    method: "POST",
+                    url: "/upload",
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    },
+                    data: formData
+                }).then((res) => {
+                    app.saveFileName = res.data;
+                }).catch((err) => {
+                    console.log(err)
+                });
+            },
+            goDownloadByGet: () => {
+                window.location = "/getDownload?fileName=" + app.saveFileName;
+                //window.location = "/download2?fileName=" + app.saveFileName;
+            },
+            goDownloadByPost: () => {
+                if (app.saveFileName == null || app.saveFileName == '') {
+                    alert("请先上传文件！");
+                    return;
+                }
+                axios({
+                    method: "POST",
+                    url: "/postDownload",
+                    headers:{
+                        'Content-Type': 'application/json'
+                    },
+                    data: app.saveFileName,
+                    responseType: 'blob'
+                }).then((res) => {
+                    console.log(res)
+                    let blob = res.data;
+                    // 创建一个URL指向Blob，也就是Blob URL
+                    let url = window.URL.createObjectURL(blob);
+                    // 创建<a>标签
+                    let el = document.createElement('a');
+                    el.href = url;
+                    // 指定下载的文件名
+                    el.download = app.saveFileName;
+                    el.hidden = true;
+                    document.body.appendChild(el);
+                    el.click();
+                    document.body.removeChild(el);
+
+                    //let reader = new FileReader();
+                    //reader.readAsDataURL(blob);
+                    //reader.onload = (e) => {
+                    //    //todo 大文件没有下载弹框，待求证
+                    //    let a = document.createElement('a');
+                    //    a.download = app.saveFileName;
+                    //    a.href = e.target.result;
+                    //    document.body.appendChild(a);
+                    //    a.click();
+                    //    document.body.removeChild(a);
+                    //}
+                }).catch((err) => {
+                    console.log(err);
+                });
+            }
+        }
+    })
+</script>
+</body>
+</html>

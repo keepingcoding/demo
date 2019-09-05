@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="uploadApp">
+
+    <span>姓名：</span><input type="text" v-model="bean.name"/><br/>
+    <span>年龄：</span><input type="text" v-model="bean.age"/><br/>
+    <input type="file"/><br/><br/><br/>
+    <button @click="goUpload" style="width: 80px;height: 30px;">上传</button>
+
+    <hr/>
+    <span>{{ saveFileName }}</span>
+
+
+</div>
+
+<script src="/js/public/vue.min.js"></script>
+<script src="/js/public/axios.min.js"></script>
+
+<script>
+    let app = new Vue({
+        el: '#uploadApp',
+        data: {
+            bean: {},
+            saveFileName: ''
+        },
+        methods: {
+            goUpload: () => {
+                let file = document.querySelector('input[type=file]').files[0];
+                let list = {
+                    "name": app.bean.name,
+                    "age": parseInt(app.bean.age)
+                };
+
+                let formData = new window.FormData();
+                formData.append("formData", new Blob([JSON.stringify(list)], {type: "application/json"}));
+                formData.append('file', file);
+                axios({
+                    method: "POST",
+                    url: "/uploadFileAndData",
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    },
+                    data: formData
+                }).then(function (res) {
+                    console.log(res);
+                    app.saveFileName = res.data;
+                }).catch(function (err) {
+                    console.log(err)
+                });
+            }
+        }
+    })
+</script>
+</body>
+</html>
