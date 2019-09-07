@@ -72,7 +72,6 @@ public class CommonFileController {
      * @return
      */
     @PostMapping("/postDownload")
-    @ResponseBody
     public void downloadFileByPost(@RequestBody String fileName, HttpServletRequest request, HttpServletResponse response) {
         if (StringUtils.isBlank(fileName)) {
             return;
