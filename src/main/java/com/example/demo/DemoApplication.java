@@ -14,10 +14,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 /**
  * @author zhaozisheng
  */
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class,
-        RedisAutoConfiguration.class,
-        RedisRepositoriesAutoConfiguration.class,
-        RabbitAutoConfiguration.class})
+@SpringBootApplication(exclude = {RabbitAutoConfiguration.class})
 @ImportResource(locations = {"classpath*:applicationContext.xml"})
 @PropertySource(value = {"classpath:config.properties"}, ignoreResourceNotFound = true)
 public class DemoApplication {
