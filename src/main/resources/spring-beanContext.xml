@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- mybatis start -->
+
+    <!-- primary -->
+    <bean id="primarySqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="primaryDataSource"/>
+        <property name="mapperLocations"
+                  value="classpath:com/example/demo/db/primary/**/*.xml"/>
+        <property name="configLocation" value="classpath:mybatis-config.xml"/>
+    </bean>
+    <bean id="primarySqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg index="0" ref="primarySqlSessionFactory" />
+    </bean>
+    <bean id="primaryDb" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.example.demo.db.primary.dao"/>
+        <property name="sqlSessionTemplateBeanName" value="primarySqlSessionTemplate"/>
+    </bean>
+
+    <!-- secondary -->
+    <bean id="secondarySqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="secondaryDataSource"/>
+        <property name="mapperLocations"
+                  value="classpath:com/example/demo/db/secondary/**/*.xml"/>
+        <property name="configLocation" value="classpath:mybatis-config.xml"/>
+    </bean>
+    <bean id="secondarySqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg index="0" ref="secondarySqlSessionFactory" />
+    </bean>
+    <bean id="secondaryDb" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.example.demo.db.secondary.dao"/>
+        <property name="sqlSessionTemplateBeanName" value="secondarySqlSessionTemplate"/>
+    </bean>
+
+    <!-- mybatis end -->
+
+</beans>

@@ -207,6 +207,6 @@ public class CommonFileController {
         return parentPath;
     }
 
-    @Value("${com.example.demo.baseStoreDir:''}")
+    @Value("${com.example.demo.base-store-dir:''}")
     private String baseStoreDir;
 }
