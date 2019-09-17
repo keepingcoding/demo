@@ -14,6 +14,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 /**
  * @author zhaozisheng
  */
+//@MapperScan(basePackages = "com.example.demo.mybatis.dao")
 @SpringBootApplication(exclude = {RabbitAutoConfiguration.class})
 @ImportResource(locations = {"classpath*:applicationContext.xml"})
 @PropertySource(value = {"classpath:config.properties"}, ignoreResourceNotFound = true)
