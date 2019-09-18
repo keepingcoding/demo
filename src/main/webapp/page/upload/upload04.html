@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="uploadApp">
+
+    <input type="file"/>
+    <br/><br/><br/>
+    <button @click="goUpload" style="width: 80px;height: 30px;">上传</button>
+
+    <hr/>
+    <span>{{ saveFileName }}</span>
+    <br/><br/><br/>
+    <button @click="goPreview" style="width: 80px;height: 30px;">图片预览</button>
+
+    <div id="imgShowModal" style="margin-left: 0;display: none;">
+        <img :src="showImg">
+    </div>
+
+</div>
+
+<script src="/js/public/jquery-3.4.1.min.js"></script>
+<script src="/js/public/vue.min.js"></script>
+<script src="/js/public/axios.min.js"></script>
+
+<script>
+    let app = new Vue({
+        el: '#uploadApp',
+        data: {
+            bean: {},
+            saveFileName: '',
+            showImg: ''
+        },
+        methods: {
+            goUpload: () => {
+                let file = document.querySelector('input[type=file]').files[0];
+                let formData = new window.FormData();
+                formData.append('file', file);
+                axios({
+                    method: "POST",
+                    url: "/upload",
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    },
+                    data: formData
+                }).then(function (res) {
+                    app.saveFileName = res.data;
+                }).catch(function (err) {
+                    console.log(err)
+                });
+            },
+            goPreview: () => {
+                axios({
+                    method: "POST",
+                    url: "/download3",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    data: app.saveFileName,
+                    responseType: 'arraybuffer'
+                }).then(response => {
+                    return 'data:image/png;base64,' + btoa(new Uint8Array(response.data).reduce((data, byte) => data + String.fromCharCode(byte), ''));
+                }).then(data => {
+                    app.showImg = data;
+                    $('#imgShowModal').show();
+                });
+            }
+        }
+    })
+</script>
+</body>
+</html>

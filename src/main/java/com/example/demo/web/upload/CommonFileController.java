@@ -1,7 +1,6 @@
 package com.example.demo.web.upload;
 
 import com.google.common.io.Files;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -9,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -73,7 +73,7 @@ public class CommonFileController {
      */
     @PostMapping("/postDownload")
     public void downloadFileByPost(@RequestBody String fileName, HttpServletRequest request, HttpServletResponse response) {
-        if (StringUtils.isBlank(fileName)) {
+        if (!StringUtils.hasText(fileName)) {
             return;
         }
 
@@ -108,7 +108,7 @@ public class CommonFileController {
 
     @GetMapping("/getDownload")
     public void downloadFileByGet(@RequestParam String fileName, HttpServletRequest request, HttpServletResponse response) {
-        if (StringUtils.isBlank(fileName)) {
+        if (!StringUtils.hasText(fileName)) {
             return;
         }
 
@@ -144,28 +144,12 @@ public class CommonFileController {
 
     @GetMapping("/download2")
     public ResponseEntity<Object> downloadFile2(@RequestParam String fileName) {
-        String parentPath = getParentPath();
-        File file = new File(parentPath, fileName);
-        InputStreamResource resource = null;
-        try {
-            resource = new InputStreamResource(new FileInputStream(file));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        return downloadFile(fileName);
+    }
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Disposition", String.format("attachment;filename=\"%s", fileName));
-        headers.add("Cache-Control", "no-cache,no-store,must-revalidate");
-        headers.add("Pragma", "no-cache");
-        headers.add("Expires", "0");
-
-        ResponseEntity<Object> responseEntity = ResponseEntity.ok()
-                .headers(headers)
-                .contentLength(file.length())
-                .contentType(MediaType.parseMediaType("application/octet-stream"))
-                .body(resource);
-
-        return responseEntity;
+    @RequestMapping("/download3")
+    public ResponseEntity<Object> downloadFile3(@RequestBody String fileName) {
+        return downloadFile(fileName);
     }
 
 
@@ -195,10 +179,35 @@ public class CommonFileController {
         return null;
     }
 
+    private ResponseEntity<Object> downloadFile(String fileName){
+        String parentPath = getParentPath();
+        File file = new File(parentPath, fileName);
+        InputStreamResource resource = null;
+        try {
+            resource = new InputStreamResource(new FileInputStream(file));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", String.format("attachment;filename=\"%s", fileName));
+        headers.add("Cache-Control", "no-cache,no-store,must-revalidate");
+        headers.add("Pragma", "no-cache");
+        headers.add("Expires", "0");
+
+        ResponseEntity<Object> responseEntity = ResponseEntity.ok()
+                .headers(headers)
+                .contentLength(file.length())
+                .contentType(MediaType.parseMediaType("application/octet-stream"))
+                .body(resource);
+
+        return responseEntity;
+    }
+
     private String getParentPath() {
         String parentPath = "";
         //默认存储classpath目录，可修改为可配置
-        if (StringUtils.isBlank(baseStoreDir)) {
+        if (!StringUtils.hasText(baseStoreDir)) {
             String rootUri = ClassUtils.getDefaultClassLoader().getResource("").getPath();
             parentPath = rootUri + File.separator + "upload" + File.separator + "base";
         } else {
