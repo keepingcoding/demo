@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.db.primary.dao.ext.BeanExtMapper">
+
+    <insert id="batchInsert" parameterType="java.util.List">
+        insert into person (
+            id, `name`, age, phone, address, created_time, updated_time
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+        (
+            #{item.id,jdbcType=BIGINT},
+            #{item.name,jdbcType=VARCHAR},
+            #{item.age,jdbcType=TINYINT},
+            #{item.phone,jdbcType=VARCHAR},
+            #{item.address,jdbcType=VARCHAR},
+            #{item.createdTime,jdbcType=BIGINT},
+            #{item.updatedTime,jdbcType=BIGINT}
+        )
+        </foreach>
+    </insert>
+</mapper>
