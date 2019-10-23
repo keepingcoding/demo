@@ -21,6 +21,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 public class DemoApplication {
 
     public static void main(String[] args) {
+        //开启log日志彩色显示
+        System.setProperty("log4j.skipJansi", "false");
+
         SpringApplication.run(DemoApplication.class, args);
     }
 }

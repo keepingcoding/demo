@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 共有8个级别，按照从低到高为：ALL < TRACE < DEBUG < INFO < WARN < ERROR < FATAL < OFF -->
+<!-- status指定log4j本身的打印日志的级别 -->
+<Configuration status="WARN">
+
+	<Properties>
+		<Property name="base.package">com.example.demo</Property>
+		<Property name="log.level">${sys:log4j.log.level:-DEBUG}</Property>
+		<Property name="logfile.path">${sys:log4j.logfile.path:-/data/logs/access}/@artifactId@</Property>
+		<Property name="logfile.arch.path">${sys:log4j.logfile.path:-/data/logs/access}/@artifactId@/${date:yyyy-MM}</Property>
+		<Property name="logfile.arch.suffix">%d{yyyy-MM-dd}-%i.log.gz</Property>
+		<Property name="logOut.pattern">%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight{%5p} ${sys:PID} --- [%15.15t] %-40.40c{1.} : %m%n</Property>
+		<Property name="logfile.pattern">%d{yyyy-MM-dd HH:mm:ss.SSS} %5p [%t] &lt;%c&gt; : %m%n</Property>
+		<Property name="timestamp.pattern">%d{yyyy-MM-dd HH:mm:ss.SSS}{GMT+0}</Property>
+	</Properties>
+
+	<Appenders>
+		<Console name="STDOUT" target="SYSTEM_OUT">
+			<ThresholdFilter level="ERROR" onMatch="DENY" onMismatch="ACCEPT" />
+			<PatternLayout pattern="${logOut.pattern}"/>
+		</Console>
+		<Console name="STDERR" target="SYSTEM_ERR">
+			<ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY" />
+			<PatternLayout pattern="${logOut.pattern}"/>
+		</Console>
+
+		<RollingRandomAccessFile name="SERVICE_LOG_FILE" fileName="${logfile.path}/service.log"
+								 filePattern="${logfile.arch.path}/service-${logfile.arch.suffix}">
+			<PatternLayout pattern="${logfile.pattern}"/>
+			<Policies>
+				<!-- 基于时间的滚动策略(interval属性). The default value is 1. -->
+				<TimeBasedTriggeringPolicy />
+				<!-- 基于文件大小的滚动策略(size属性)：SizeBasedTriggeringPolicy -->
+			</Policies>
+			<!-- 用来指定同一个文件夹下最多有几个日志文件时开始删除最旧的，创建新的(通过max属性). The default value is 7. -->
+			<DefaultRolloverStrategy />
+		</RollingRandomAccessFile>
+
+	</Appenders>
+
+	<Loggers>
+		<!-- Root Logger -->
+		<Root level="INFO">
+			<AppenderRef ref="STDOUT"/>
+			<AppenderRef ref="STDERR"/>
+			<AppenderRef ref="SERVICE_LOG_FILE" />
+		</Root>
+
+		<!-- additivity="false"只在自定义的Appender中进行输出 -->
+		<!-- Base Logger -->
+		<Logger name="${base.package}" level="${log.level}"></Logger>
+	</Loggers>
+	
+</Configuration>
