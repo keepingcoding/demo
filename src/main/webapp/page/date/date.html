@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link type="text/css" rel="stylesheet" href="/jedate/skin/jedate.css">
+    <script type="text/javascript" src="/js/public/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript" src="/js/public/vue.min.js"></script>
+    <script type="text/javascript" src="/jedate/dist/jedate.min.js"></script>
+</head>
+<body>
+<div id="dateApp">
+    <div>
+        <span>开航时间：</span>
+        <input id="startTime" style="cursor: pointer;" placeholder="请选择" readonly/>
+
+        <span>回港时间：</span>
+        <input id="endTime" style="cursor: pointer;" placeholder="请选择" readonly/>
+
+<!--        <button @click="resetParams">重置</button>-->
+    </div>
+</div>
+
+<script>
+    var app = new Vue({
+        el: '#dateApp',
+        data: {
+            message: 'Hello Vue!'
+        },
+        methods: {
+            resetParams: function () {
+                $('#startTime').val('');
+                $('#endTime').val('');
+            }
+        },
+        mounted: function () {
+            jeDate('#startTime', link1);
+            jeDate('#endTime', link2);
+            $('#startTime').val(getNow());
+
+            function link1(istg) {
+                return {
+                    trigger: istg || "click",
+                    format: 'YYYY-MM-DD',
+                    //isinitVal: true,
+                    onClose: false,
+                    maxDate: function (obj) {
+                        var nowMinDate = jeDate.valText('#endTime') == "";
+                        return nowMinDate ? "2099-12-31" : jeDate.valText('#endTime');
+                    },
+                    donefun: function (obj) {
+                        jeDate("#endTime", link2(false));
+                    }
+                };
+            }
+
+            function link2(istg) {
+                return {
+                    trigger: istg || "click",
+                    format: 'YYYY-MM-DD',
+                    onClose: false,
+                    minDate: function (that) {
+                        var nowMinDate = jeDate.valText('#startTime') == "";
+                        return nowMinDate ? "1900-01-01" : jeDate.valText('#startTime');
+                    },
+                    donefun: function (obj) {
+                        jeDate("#startTime", link1(false));
+                    }
+                };
+            }
+
+            function getNow() {
+                var now = new Date();
+                var year = now.getFullYear();
+                var month = now.getMonth();
+                var date = now.getDate();
+                month = month + 1;
+                if (month < 10) month = "0" + month;
+                if (date < 10) date = "0" + date;
+                return year + "-" + month + "-" + date;
+            }
+
+        }
+    })
+</script>
+</body>
+</html>

@@ -5,14 +5,14 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-         <version>2.1.4.RELEASE</version>
+         <version>2.1.6.RELEASE</version>
         <!--<version>1.5.20.RELEASE</version>-->
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.example</groupId>
     <artifactId>demo</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>sample</name>
+    <name>demos</name>
     <description>Demo project for Spring Boot</description>
 
     <properties>
@@ -188,6 +188,11 @@
             <version>2.9.2</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+
 
     </dependencies>
 
@@ -206,30 +211,30 @@
     </repositories>
 
     <build>
-        <!-- 资源目录 -->
         <resources>
             <resource>
-                <!-- 设定主资源目录  -->
-                <directory>src/main/java</directory>
-
-                <!-- maven default生命周期，process-resources阶段执行maven-resources-plugin插件的resources目标处理主资源目下的资源文件时，只处理如下配置中包含的资源类型 -->
+                <directory>${basedir}/src/main/java</directory>
                 <includes>
                     <include>**/*.xml</include>
                 </includes>
-
-                <!-- maven default生命周期，process-resources阶段执行maven-resources-plugin插件的resources目标处理主资源目下的资源文件时，不处理如下配置中包含的资源类型（剔除下如下配置中包含的资源类型）-->
-                <excludes>
-                    <exclude>**/*.yaml</exclude>
-                </excludes>
-
-                <!-- maven default生命周期，process-resources阶段执行maven-resources-plugin插件的resources目标处理主资源目下的资源文件时，指定处理后的资源文件输出目录，默认是${build.outputDirectory}指定的目录-->
-                <!--<targetPath>${build.outputDirectory}</targetPath> -->
-
-                <!-- maven default生命周期，process-resources阶段执行maven-resources-plugin插件的resources目标处理主资源目下的资源文件时，是否对主资源目录开启资源过滤 -->
+            </resource>
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
                 <filtering>true</filtering>
+                <includes>
+                    <include>log4j2.xml</include>
+                    <include>*.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>log4j2.xml</exclude>
+                    <exclude>*.properties</exclude>
+                </excludes>
             </resource>
         </resources>
-
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

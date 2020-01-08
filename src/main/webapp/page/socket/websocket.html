@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="/js/public/jquery-3.4.1.min.js"></script>
+    <!-- 这里需要引入这两个websocket相关的js -->
+    <script type="text/javascript" src="/js/public/stomp-websocket/stomp.min.js"></script>
+    <script type="text/javascript" src="/js/public/sockjs-client/sockjs.min.js"></script>
+</head>
+
+<body onload="connect();">
+<div>
+    <div id="conversationDiv">
+        <label>Please input : </label><input type="text" id="name"/>
+
+        <button id="sendName" onclick="sendName();">发送</button>
+        <p id="response"></p>
+    </div>
+</div>
+
+<script type="text/javascript">
+    window.onbeforeunload = function () {
+        disconnect();
+    }
+
+    var stompClient = null;
+
+    function connect() {
+        // websocket的连接地址，即WebSocketMessageBrokerConfigurer中registry.addEndpoint("/websocket-simple")配置的地址
+        var socket = new SockJS('/websocket-simple');
+        stompClient = Stomp.over(socket);
+        stompClient.connect({}, function (frame) {
+            console.log('Connected: ' + frame);
+            // 客户端订阅消息的地址：即服务端使用@SendTo("/topic/getResponse")注解的里配置的值
+            stompClient.subscribe('/topic/getResponse', function (response) {
+                showResponse(response.body);
+            });
+        });
+    }
+
+    function disconnect() {
+        if (stompClient != null) {
+            stompClient.disconnect();
+        }
+    }
+
+    function sendName() {
+        var name = $('#name').val();
+        // 客户端消息发送的地址：即服务端使用@MessageMapping("/receive")注解的里配置的值
+        // 前缀/app是WebSocketMessageBrokerConfigurer中config.setApplicationDestinationPrefixes("/app")配置的值
+        stompClient.send("/app/receive", {}, JSON.stringify({'name': name}));
+    }
+
+    function showResponse(message) {
+        var response = $("#response");
+        response.html(message + "<br>" + response.html());
+    }
+</script>
+</body>
+</html>
